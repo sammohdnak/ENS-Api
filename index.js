@@ -1,7 +1,34 @@
 const express = require("express");
-const { reverseENSResolve } = require("./reverse-resolver");
 const app = express();
 require("dotenv").config();
+const Moralis = require("moralis").default;
+Moralis.start({
+  apiKey: process.env.MORALIS_API_KEY,
+});
+
+reverseENSResolve = async (addresses) => {
+  console.log(addresses);
+  // Loop through each address in the input array
+  const ensNames = [];
+  for (const address of addresses) {
+    const response = await Moralis.EvmApi.resolve.resolveAddress({
+      address,
+    });
+    if (response) {
+      // console.log(response.toJSON());
+      ensNames.push({ [`${address}`]: response.toJSON() });
+    } else {
+      ensNames.push({ [`${address}`]: {} });
+    }
+
+    // Delay for 40 milliseconds to stay within the rate limit
+    await new Promise((resolve) => setTimeout(resolve, 40));
+  }
+
+  console.log(ensNames);
+  // Return a JSON object with the addresses and their ENS names
+  return { ensNames };
+};
 
 // Middleware to parse JSON data in requests
 app.use(express.json());
@@ -28,6 +55,6 @@ app.use((err, req, res, next) => {
   res.status(500).send("Internal Server Error");
 });
 
-app.listen(3000, () => {
-  console.log("App listening on port 3000");
+app.listen(5002, () => {
+  console.log("App listening on port 5002");
 });

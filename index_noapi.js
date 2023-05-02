@@ -1,8 +1,9 @@
+require("dotenv").config();
 const Moralis = require("moralis").default;
-const { EvmChain } = require("@moralisweb3/common-evm-utils");
 
-exports.reverseENSResolve = async (addresses) => {
-  // Initialize Moralis
+const addresses = ["..............", "................"];
+
+reverseENSResolve = async (addresses) => {
   await Moralis.start({
     apiKey: process.env.MORALIS_API_KEY,
   });
@@ -20,15 +21,6 @@ exports.reverseENSResolve = async (addresses) => {
       ensNames.push({ [`${address}`]: {} });
     }
 
-    // Get the ENS name from the response and add it to the output array
-    // let ensName;
-    // if (response && response !== null) {
-    //   ensName = response.get("name");
-    //   ensNames.push({ [`${address}`]: ensName });
-    // } else {
-    //   ensNames.push({ [`${address}`]: [] });
-    // }
-
     // Delay for 40 milliseconds to stay within the rate limit
     await new Promise((resolve) => setTimeout(resolve, 40));
   }
@@ -37,3 +29,9 @@ exports.reverseENSResolve = async (addresses) => {
   // Return a JSON object with the addresses and their ENS names
   return { ensNames };
 };
+
+const run = async () => {
+  console.log(await reverseENSResolve(addresses));
+};
+
+run();
